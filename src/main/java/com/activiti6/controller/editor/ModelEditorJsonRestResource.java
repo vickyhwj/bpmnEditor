@@ -1,5 +1,7 @@
 package com.activiti6.controller.editor;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.activiti.editor.constants.ModelDataJsonConstants;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.RepositoryService;
@@ -38,7 +40,7 @@ public class ModelEditorJsonRestResource implements ModelDataJsonConstants {
    */
   @SuppressWarnings("deprecation")
 @RequestMapping(value="/model/{modelId}/json", method = RequestMethod.GET, produces = "application/json")
-  public ObjectNode getEditorJson(@PathVariable String modelId) {
+  public ObjectNode getEditorJson(@PathVariable String modelId,HttpServletRequest request) {
     ObjectNode modelNode = null;
     Model model = repositoryService.getModel(modelId);
     if (model != null) {

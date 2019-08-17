@@ -57,6 +57,9 @@
 	
 	<div id="main" class="wrapper full clearfix" ng-style="{height: window.height + 'px'}" ng-app="activitiModeler" ng-include="'editor-app/editor.html'">
 	</div>
+	<script>
+	var editor;
+	</script>
 
 	<!--[if lt IE 9]>
 	<script src="editor-app/libs/es5-shim-15.3.4.5/es5-shim.js"></script>
@@ -117,6 +120,7 @@
 	<script src="editor-app/configuration/properties-execution-listeners-controller.js" type="text/javascript"></script>
 	<script src="editor-app/configuration/properties-event-listeners-controller.js" type="text/javascript"></script>
 	<script src="editor-app/configuration/properties-assignment-controller.js" type="text/javascript"></script>
+	<script src="editor-app/configuration/properties-formkey-controller.js" type="text/javascript"></script>
 	<script src="editor-app/configuration/properties-fields-controller.js" type="text/javascript"></script>
 	<script src="editor-app/configuration/properties-form-properties-controller.js" type="text/javascript"></script>
 	<script src="editor-app/configuration/properties-in-parameters-controller.js" type="text/javascript"></script>

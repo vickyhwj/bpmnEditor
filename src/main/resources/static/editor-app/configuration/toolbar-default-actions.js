@@ -306,6 +306,8 @@ var SaveModelCtrl = [ '$rootScope', '$scope', '$http', '$route', '$location',
             'description' : description};
     
     $scope.saveDialog = saveDialog;
+    console.log("setting");
+    editor=$scope.editor;
     
     var json = $scope.editor.getJSON();
     json = JSON.stringify(json);

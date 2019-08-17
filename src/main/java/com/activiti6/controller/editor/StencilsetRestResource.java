@@ -42,7 +42,7 @@ public class StencilsetRestResource {
 			removeByGroup("边界事件", stencils);
 			removeByGroup("泳道列表", stencils);
 
-
+			
 			return jsonObject.toString();
 		} catch (Exception e) {
 			throw new ActivitiException("Error while loading stencil set", e);

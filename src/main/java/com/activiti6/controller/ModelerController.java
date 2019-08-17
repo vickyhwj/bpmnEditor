@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.editor.constants.ModelDataJsonConstants;
 import org.activiti.editor.language.json.converter.BpmnJsonConverter;
+import org.activiti.editor.language.json.converter.BpmnJsonConverterUtil;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
@@ -24,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.activiti6.config.CustomBpmnJsonConverter;
+import com.activiti6.config.CustomUserTaskJsonConverter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -126,8 +129,14 @@ public class ModelerController{
 	        	map.put("code", "FAILURE");
 	            return map;
 	        }
+	        
+	     // TODO:UserTask自定义扩展属性
+	        CustomBpmnJsonConverter.getConvertersToBpmnMap().put("UserTask", CustomUserTaskJsonConverter.class);
+	        BpmnJsonConverter bpmnJsonConverter=new CustomBpmnJsonConverter();
+	        
 			JsonNode modelNode = new ObjectMapper().readTree(bytes);
-			BpmnModel model = new BpmnJsonConverter().convertToBpmnModel(modelNode);
+			BpmnModel model = bpmnJsonConverter.convertToBpmnModel(modelNode);
+			System.out.println( new BpmnJsonConverter().convertToJson(model).toString());
 	        Deployment deployment = repositoryService.createDeployment()
 	        		.name(modelData.getName())
 	        		.addBpmnModel(modelData.getKey()+".bpmn20.xml", model)
