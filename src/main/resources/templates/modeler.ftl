@@ -120,6 +120,8 @@
 	<script src="editor-app/configuration/properties-execution-listeners-controller.js" type="text/javascript"></script>
 	<script src="editor-app/configuration/properties-event-listeners-controller.js" type="text/javascript"></script>
 	<script src="editor-app/configuration/properties-assignment-controller.js" type="text/javascript"></script>
+	<script src="editor-app/configuration/properties-extenison-controller.js" type="text/javascript"></script>
+	
 	<script src="editor-app/configuration/properties-formkey-controller.js" type="text/javascript"></script>
 	<script src="editor-app/configuration/properties-fields-controller.js" type="text/javascript"></script>
 	<script src="editor-app/configuration/properties-form-properties-controller.js" type="text/javascript"></script>

@@ -1,0 +1,96 @@
+<!-- <div class="modal" ng-controller="KisBpmAssignmentPopupCtrl">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="close()">&times;</button>
+                <h2 translate>PROPERTY.ASSIGNMENT.TITLE</h2>
+            </div>
+            <div class="modal-body">
+            
+            	<div class="row row-no-gutter">
+            		<div class="form-group">
+            			<label for="assigneeField">{{'PROPERTY.ASSIGNMENT.ASSIGNEE' | translate}}</label>
+							<input type="text" id="assigneeField" class="form-control" ng-model="assignment.assignee" placeholder="{{'PROPERTY.ASSIGNMENT.ASSIGNEE_PLACEHOLDER' | translate}}" 
+            						ng-click="choseAssignment('assignee')" ng-value="candidateUser.choseAssignee"/>
+            		</div>
+            	</div>
+            	
+                <div class="row row-no-gutter">
+                    <div class="form-group">
+                    	<label for="userField">{{'PROPERTY.ASSIGNMENT.CANDIDATE_USERS' | translate}}</label>
+                        <div ng-repeat="candidateUser in assignment.candidateUsers">
+            	            <input id="userField" class="form-control" type="text" ng-model="candidateUser.value" ng-click="choseAssignment('assignees')" ng-value="candidateUser.value"/>
+                        </div>
+                   	</div>
+            
+                    <div class="form-group">
+                    	<label for="groupField">{{'PROPERTY.ASSIGNMENT.CANDIDATE_GROUPS' | translate}}</label>
+                        <div ng-repeat="candidateGroup in assignment.candidateGroups">
+                        	<input id="groupField" class="form-control" type="text" ng-model="candidateGroup.value" ng-click="choseCandidateGroups()"/>
+                        </div>
+                    </div>
+                </div>
+            
+            </div>
+            <div class="modal-footer">
+                <button ng-click="close()"  translate>ACTION.CANCEL</button>
+                <button ng-click="save()"  translate>ACTION.SAVE</button>
+            </div>
+        </div>
+    </div>
+</div> -->
+
+<div class="modal" ng-controller="KisBpmExtenisonPopupCtrl">
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal"
+				aria-hidden="true" ng-click="close()">&times;</button>
+		</div>
+		<div class="modal-body">
+			
+			<div class="input-group input-group-lg">
+			  <span class="input-group-addon" id="sizing-addon1">name</span>
+			  <input type="text" class="form-control" placeholder="Username" aria-describedby="sizing-addon1" ng-model="extenison.name">
+			</div>
+			<div class="input-group input-group-lg">
+			  <span class="input-group-addon" id="sizing-addon1">type</span>
+			  <input type="text" class="form-control" placeholder="Username" aria-describedby="sizing-addon1" ng-model="extenison.type">
+			</div>
+			<div class="bs-docs-section">
+				<table class="table">
+					<caption>Optional table caption.</caption>
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>First Name</th>
+							<th>Last Name</th>
+							<th>Username</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<th scope="row">1</th>
+							<td>Mark</td>
+							<td>Otto</td>
+							<td>@mdo</td>
+						</tr>
+						<tr>
+							<th scope="row">2</th>
+							<td>Jacob</td>
+							<td>Thornton</td>
+							<td>@fat</td>
+						</tr>
+						<tr>
+							<th scope="row">3</th>
+							<td>Larry</td>
+							<td>the Bird</td>
+							<td>@twitter</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+
+</div>

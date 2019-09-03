@@ -56,6 +56,10 @@ KISBPM.PROPERTY_CONFIG =
         "readModeTemplateUrl": "editor-app/configuration/properties/assignment-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/assignment-write-template.html"
     },
+    "oryx-extenison-complex": {
+        "readModeTemplateUrl": "editor-app/configuration/properties/extenison-display-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/extenison-write-template.html"
+    },
     "oryx-servicetaskfields-complex": {
         "readModeTemplateUrl": "editor-app/configuration/properties/fields-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/fields-write-template.html"
