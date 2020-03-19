@@ -19,6 +19,8 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,10 +28,19 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.activiti6.config.CustomBpmnJsonConverter;
+import com.activiti6.config.CustomExclusiveGatewayJsonConverter;
 import com.activiti6.config.CustomUserTaskJsonConverter;
+import com.activiti6.config.SeqFlowJsonConverter;
+import com.activiti6.entity.ModelVo;
+import com.activiti6.entity.Modeljson;
+import com.activiti6.service.ModelJsonService;
+import com.activiti6.service.ModelService;
+import com.activiti6.util.ActivitBeanRowMapper;
+import com.activiti6.util.Result;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.sun.mail.handlers.message_rfc822;
 
 /**
  * 流程控制器
@@ -47,13 +58,24 @@ public class ModelerController{
     @Autowired
     private HistoryService historyService;
     @Autowired
-    private RuntimeService runtimeService;
+    private RuntimeService runtimeService ;
+    
+    @Autowired
+    ModelJsonService modelJsonService;
+    
+    @Autowired 
+    ModelService modelService;
 
+    @Autowired
+    JdbcTemplate jdbcTemplate;
     
 	@RequestMapping("index")
 	public ModelAndView index(ModelAndView modelAndView) {
         modelAndView.setViewName("index");
-        modelAndView.addObject("modelList", repositoryService.createModelQuery().list());
+//        modelAndView.addObject("modelList", repositoryService.createModelQuery().list());
+        String sql="select ID_, REV_, NAME_, KEY_, CATEGORY_, CREATE_TIME_, LAST_UPDATE_TIME_,  META_INFO_, DEPLOYMENT_ID_, EDITOR_SOURCE_VALUE_ID_, EDITOR_SOURCE_EXTRA_VALUE_ID_, TENANT_ID_,VERSION_,(select count(1) from modeljson where model_id=id_ ) jversion from act_re_model m";
+//        modelAndView.addObject("modelList", repositoryService.createNativeModelQuery().sql(sql).list());
+        modelAndView.addObject("modelList", jdbcTemplate.query(sql,new Object[]{}, new ActivitBeanRowMapper(ModelVo.class)));
         return modelAndView;
 	}
 	
@@ -118,42 +140,18 @@ public class ModelerController{
      */
     @ResponseBody
     @RequestMapping("/publish")
-    public Object publish(String modelId){
-    	logger.info("流程部署入参modelId：{}",modelId);
-    	Map<String, String> map = new HashMap<String, String>();
-		try {
-			Model modelData = repositoryService.getModel(modelId);
-	        byte[] bytes = repositoryService.getModelEditorSource(modelData.getId());
-	        if (bytes == null) {
-	        	logger.info("部署ID:{}的模型数据为空，请先设计流程并成功保存，再进行发布",modelId);
-	        	map.put("code", "FAILURE");
-	            return map;
-	        }
-	        
-	     // TODO:UserTask自定义扩展属性
-	        CustomBpmnJsonConverter.getConvertersToBpmnMap().put("UserTask", CustomUserTaskJsonConverter.class);
-	        BpmnJsonConverter bpmnJsonConverter=new CustomBpmnJsonConverter();
-	        
-			JsonNode modelNode = new ObjectMapper().readTree(bytes);
-			BpmnModel model = bpmnJsonConverter.convertToBpmnModel(modelNode);
-			System.out.println( new BpmnJsonConverter().convertToJson(model).toString());
-	        Deployment deployment = repositoryService.createDeployment()
-	        		.name(modelData.getName())
-	        		.addBpmnModel(modelData.getKey()+".bpmn20.xml", model)
-	        		.deploy();
-	        modelData.setDeploymentId(deployment.getId());
-	        repositoryService.saveModel(modelData);
-	        map.put("code", "SUCCESS");
-		} catch (Exception e) {
-			logger.info("部署modelId:{}模型服务异常：{}",modelId,e);
-			map.put("code", "FAILURE");
-		}
-		logger.info("流程部署出参map：{}",map);
-        return map;
+    public Result publish(String modelId){
+    	try{
+    		modelService.publish(modelId);
+    		return new Result().success(); 
+    	}catch(Exception e){
+    		logger.error("发布流程失败", e);
+    		return new Result().fail();
+    	}
     }
     
     /**
-     * 撤销流程定义
+     * 撤销流程定义1
      * @param modelId 模型ID
      * @param result
      * @return
@@ -161,24 +159,13 @@ public class ModelerController{
     @ResponseBody
     @RequestMapping("/revokePublish")
     public Object revokePublish(String modelId){
-    	logger.info("撤销发布流程入参modelId：{}",modelId);
-    	Map<String, String> map = new HashMap<String, String>();
-		Model modelData = repositoryService.getModel(modelId);
-		if(null != modelData){
-			try {
-				/**
-				 * 参数不加true:为普通删除，如果当前规则下有正在执行的流程，则抛异常 
-				 * 参数加true:为级联删除,会删除和当前规则相关的所有信息，包括历史 
-				 */
-				repositoryService.deleteDeployment(modelData.getDeploymentId(),true);
-				map.put("code", "SUCCESS");
-			} catch (Exception e) {
-				logger.error("撤销已部署流程服务异常：{}",e);
-				map.put("code", "FAILURE");
-			}
-		}
-		logger.info("撤销发布流程出参map：{}",map);
-        return map;
+    	try{
+    		modelService.revokePublish(modelId);
+    		return new Result().success();
+    	}catch(Exception e){
+    		logger.error(e.getMessage(),e);
+    		return new Result().fail();
+    	}
     }
     
     /**
@@ -190,23 +177,12 @@ public class ModelerController{
     @ResponseBody
     @RequestMapping("/delete")
     public Object deleteProcessInstance(String modelId){
-    	logger.info("删除流程实例入参modelId：{}",modelId);
-    	Map<String, String> map = new HashMap<String, String>();
-		Model modelData = repositoryService.getModel(modelId);
-		if(null != modelData){
-			try {
-			   ProcessInstance pi = runtimeService.createProcessInstanceQuery().processDefinitionKey(modelData.getKey()).singleResult();
-			   if(null != pi) {
-				   runtimeService.deleteProcessInstance(pi.getId(), "");
-				   historyService.deleteHistoricProcessInstance(pi.getId());
-			   }
-				map.put("code", "SUCCESS");
-			} catch (Exception e) {
-				logger.error("删除流程实例服务异常：{}",e);
-				map.put("code", "FAILURE");
-			}
-		}
-		logger.info("删除流程实例出参map：{}",map);
-        return map;
+    	try{
+    		modelService.deleteModel(modelId);
+    		return new Result().success();
+    	}catch(Exception e){
+    		logger.error(e.getMessage(),e);
+    		return new Result().fail();
+    	}
     }
 }

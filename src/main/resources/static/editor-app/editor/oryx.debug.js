@@ -12405,6 +12405,7 @@ ORYX.Editor.createByUrl = function(modelUrl){
       method: 'GET',
       onSuccess: function(transport) {
     	var editorConfig = JSON.parse(transport.responseText);
+    	console.log("editorConfig",editorConfig);
         new ORYX.Editor(editorConfig);
       }.bind(this)
     });

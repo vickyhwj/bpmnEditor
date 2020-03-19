@@ -34,7 +34,7 @@ public class ModelEditorJsonRestResource implements ModelDataJsonConstants {
   @Autowired
   private ObjectMapper objectMapper;
   /**
-   * 获取流程json信息
+   * 获取流程json信息1
    * @param modelId
    * @return
    */

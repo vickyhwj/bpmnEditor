@@ -7,6 +7,7 @@ spring:
   password: root
   driverClassName: com.mysql.jdbc.Driver
 
+ 
 #freemarker妯℃澘閰嶇疆
   freemarker:
     suffix: .ftl
@@ -35,4 +36,17 @@ server:
 
  
 server:
-  port: 8080
+  port: 8081
+  
+logging:
+  level:
+    root: debug
+
+eureka:
+ client:
+  service-url:
+   defaultZone: http://peer1:1111/eureka/
+  fetch-registry: true
+spring:
+  application:
+   name: activiti-service

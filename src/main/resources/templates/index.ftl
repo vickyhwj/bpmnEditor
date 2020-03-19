@@ -14,6 +14,7 @@
 	    <tr>
 	        <td width="10%">模型编号</td>
 	        <td width="10%">版本</td>
+	        <td width="10%">已部署</td>
 	        <td width="20%">模型名称</td>
 	        <td width="20%">模型key</td>
 	        <td width="40%">操作</td>
@@ -21,6 +22,7 @@
 	        <#list modelList as model>
 	        <tr>
 	            <td width="10%">${model.id}</td>
+	            <td width="10%">${model.jversion}</td>
 	            <td width="10%">${model.version}</td>
 	            <td width="20%"><#if (model.name)??>${model.name}<#else> </#if></td>
 	            <td width="20%"><#if (model.key)??>${model.key}<#else> </#if></td>

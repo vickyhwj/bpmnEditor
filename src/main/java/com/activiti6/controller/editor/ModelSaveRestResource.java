@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -47,11 +48,26 @@ public class ModelSaveRestResource implements ModelDataJsonConstants {
 
 	@Autowired
 	private ObjectMapper objectMapper;
+	
+	
+	@RequestMapping(value = "/model/save")
+	@ResponseStatus(value = HttpStatus.OK)
+	public void saveModel111( String modelId, String name, String description, String json_xml,
+			String svg_xml) {
+		saveModel(modelId, name, description, json_xml, svg_xml);
+	}
 
+	
+	@RequestMapping(value = "/model/toUpdate")
+	public ModelAndView toUpdate(ModelAndView modelAndView) {
+        modelAndView.setViewName("modelUpdate");
+        return modelAndView;
+	}
+	
 	/**
 	 * 保存流程
 	 * 
-	 * @param modelId
+	 * @param modelId1
 	 *            模型ID
 	 * @param name
 	 *            流程模型名称
@@ -71,12 +87,13 @@ public class ModelSaveRestResource implements ModelDataJsonConstants {
 
 			ObjectNode modelJson = (ObjectNode) objectMapper.readTree(model.getMetaInfo());
 
-			json_xml = doFilter(json_xml);
+//			json_xml = doFilter(json_xml);
 
 			modelJson.put(MODEL_NAME, name);
 			modelJson.put(MODEL_DESCRIPTION, description);
 			model.setMetaInfo(modelJson.toString());
 			model.setName(name);
+			model.setVersion(0);
 			repositoryService.saveModel(model);
 
 			repositoryService.addModelEditorSource(model.getId(), json_xml.getBytes("utf-8"));

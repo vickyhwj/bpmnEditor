@@ -22,6 +22,7 @@
        	<activiti.version>6.0.0</activiti.version>
        <!-- <activiti.version>5.19.0.2</activiti.version> -->
         <apache.xmlgraphics.version>1.7</apache.xmlgraphics.version>
+        <json-lib.version>2.1</json-lib.version>
 	</properties>
 
 	<dependencies>
@@ -103,9 +104,34 @@
 		   <artifactId>spring-boot-starter-test</artifactId>
 		   <scope>test</scope>
 		</dependency>
+		
+		
 
+		<dependency>
+			<groupId>net.sf.json-lib</groupId>
+			<artifactId>json-lib</artifactId>
+			<version>${json-lib.version}</version>
+			<classifier>jdk15</classifier>
+		</dependency>
+		
+		<dependency>
+    <groupId>com.alibaba</groupId>
+    <artifactId>fastjson</artifactId>
+    <version>1.2.4</version>
+</dependency>
 	   
 	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>Brixton.SR5</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<build>
 		<plugins>

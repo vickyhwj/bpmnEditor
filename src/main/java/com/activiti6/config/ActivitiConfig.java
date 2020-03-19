@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import com.activiti6.util.MyListenerNotificationHelper;
+
 /**
  * activiti 配置类
  * liuzhize 2019年3月7日下午3:26:56
@@ -42,6 +44,7 @@ public class ActivitiConfig {
         configuration.setAnnotationFontName("宋体");
         configuration.setLabelFontName("宋体");
         configuration.setTransactionManager(transactionManager);
+        configuration.setListenerNotificationHelper(new MyListenerNotificationHelper());
         return configuration;
 
     }
