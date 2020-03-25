@@ -58,7 +58,13 @@
         <dependency>
             <groupId>org.activiti</groupId>
             <artifactId>activiti-spring-boot-starter-basic</artifactId>
-            <version>${activiti.version}</version> 
+            <version>${activiti.version}</version>
+            <exclusions>
+            	<exclusion>
+            		<artifactId>mybatis</artifactId>
+            		<groupId>org.mybatis</groupId>
+            	</exclusion>
+            </exclusions>
         </dependency>
         
 		<dependency>
@@ -115,10 +121,19 @@
 		</dependency>
 		
 		<dependency>
-    <groupId>com.alibaba</groupId>
-    <artifactId>fastjson</artifactId>
-    <version>1.2.4</version>
-</dependency>
+		    <groupId>com.alibaba</groupId>
+		    <artifactId>fastjson</artifactId>
+		    <version>1.2.4</version>
+		</dependency>
+	   
+	    <!--mybatis-plus自动的维护了mybatis以及mybatis-spring的依赖，
+         在springboot中这三者不能同时的出现，避免版本的冲突，表示：跳进过这个坑-->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+             <version>3.1.0</version>
+             
+        </dependency>
 	   
 	</dependencies>
 	<dependencyManagement>

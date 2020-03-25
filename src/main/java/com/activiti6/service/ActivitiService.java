@@ -1,5 +1,6 @@
 package com.activiti6.service;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -22,9 +23,12 @@ import org.activiti.bpmn.model.StartEvent;
 import org.activiti.bpmn.model.UserTask;
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.IdentityService;
+import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.history.HistoricActivityInstance;
 import org.activiti.engine.history.HistoricIdentityLink;
+import org.activiti.engine.history.HistoricProcessInstance;
 import org.activiti.engine.history.HistoricTaskInstance;
 import org.activiti.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
 import org.activiti.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
@@ -36,6 +40,7 @@ import org.activiti.engine.task.IdentityLink;
 import org.activiti.engine.task.IdentityLinkType;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.test.Deployment;
+import org.activiti.image.ProcessDiagramGenerator;
 import org.apache.catalina.valves.ExtendedAccessLogValve;
 import org.apache.commons.beanutils.ConvertUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +54,9 @@ import org.springframework.web.servlet.support.RequestContext;
 
 import com.activiti6.config.ExtAttrKeys;
 import com.activiti6.entity.NextNode;
+import com.activiti6.entity.TaskRecord;
 import com.activiti6.entity.User;
+import com.activiti6.mapper.TaskRecordMapper;
 import com.activiti6.util.BpmnUtils;
 
 import listener.ExclusiveGatewayChooseHandler;
@@ -64,6 +71,11 @@ public class ActivitiService {
 	IdentityService identityService;
 	@Autowired
 	HistoryService historyService;
+	@Autowired
+	ProcessEngine processEngine;
+	@Autowired
+	TaskRecordMapper taskRecordMapper;
+	
 	
 	public void findHistoryAssgine(){
 		HistoricTaskInstance hisTask= historyService.createHistoricTaskInstanceQuery().singleResult();
@@ -273,17 +285,17 @@ public class ActivitiService {
 //	}
 	
 	@Transactional
-	public void runAndClaim(String taskId,String nextNode,Map<String,Object> afTParam,Map<String,Object> afPParam) throws ClassNotFoundException, InstantiationException, IllegalAccessException{
-		TaskEntityImpl task= (TaskEntityImpl) taskService.createTaskQuery().taskId(taskId).singleResult();
-		List<NextNode> nextNodes= getNextNodes(taskId);
+	public void runAndClaim(TaskRecord taskRecord,String nextFlowId,Map<String,Object> afLParam, Map<String,Object> afTParam,Map<String,Object> afPParam) throws Exception{
+		TaskEntityImpl task= (TaskEntityImpl) taskService.createTaskQuery().taskId(taskRecord.getTaskId()).singleResult();
+		if(afLParam!=null){
+			taskService.setVariablesLocal(taskRecord.getTaskId(), afLParam);
+		}
+		List<NextNode> nextNodes= getNextNodes(taskRecord.getTaskId());
 		String processInstanceId= task.getProcessInstanceId();
-		Map<String,Object> tparam=new HashMap<String,Object>();
-		if(StringUtils.hasLength(nextNode)){
-			tparam.put(ExtAttrKeys.nextNode, nextNode);
+		if(StringUtils.hasLength(nextFlowId)){
+			afPParam.put(ExtAttrKeys.nextNode, nextFlowId);
 		}
-		if(afTParam!=null){
-			tparam.putAll(afTParam);
-		}
+		
 //		if(NextNode.assign_assignee.equals(assignType)){
 //			param.put(assignType, users.get(0));
 //		}
@@ -294,11 +306,50 @@ public class ActivitiService {
 //			param.put(assignType, users);
 //		}
 		
-		taskService.complete(taskId,afPParam,afTParam);
+		taskRecord.setProcessInstanceId(task.getProcessInstanceId());
+		taskRecord.setTaskName(task.getName());
+		
+		taskRecordMapper.insert(taskRecord);
+		taskService.complete(taskRecord.getTaskId(),afPParam,afTParam);
 //		BpmnModel bpmnModel = repositoryService.getBpmnModel(processInstanceId);
 //		org.activiti.bpmn.model.Process process=bpmnModel.getProcesses().get(0);
 //		List<UserTask> userTaskList = process.findFlowElementsOfType(UserTask.class);
 	
+	}
+	
+	private List<String> getActRuTaskActIds(String processInstanceId) {
+		List<String> actIds=new ArrayList<>();
+		List<Task> tasks= taskService.createTaskQuery().processInstanceId(processInstanceId).list();
+		for(Task task:tasks){
+			actIds.add(((TaskEntityImpl)task).getTaskDefinitionKey());
+		}
+		return actIds ;
+	}
+	
+	public  InputStream generateProcessDiagram( String processInstanceId) {
+		// TODO Auto-generated method stub
+		//获取历史流程实例
+		HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
+		.processInstanceId(processInstanceId).singleResult();
+		//获取历史流程定义
+		ProcessDefinitionEntity processDefinitionEntity = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(historicProcessInstance.getProcessDefinitionId());
+		//查询历史节点
+		List<HistoricActivityInstance> historicActivityInstanceList = historyService.createHistoricActivityInstanceQuery()
+		.processInstanceId(processInstanceId).orderByHistoricActivityInstanceId().asc().list();
+		//已执行历史节点
+		List<String> executedActivityIdList = new ArrayList<String>();
+		executedActivityIdList.addAll(getActRuTaskActIds(processInstanceId));
+//		historicActivityInstanceList.forEach(historicActivityInstance->{executedActivityIdList.add(historicActivityInstance.getActivityId());});
+		
+		BpmnModel bpmnModel = repositoryService.getBpmnModel(processDefinitionEntity.getId());
+		//已执行flow的集和
+//		List<String> executedFlowIdList = executedFlowIdList(bpmnModel,processDefinitionEntity,historicActivityInstanceList);
+		List<String> executedFlowIdList=new ArrayList<>();
+		
+		ProcessDiagramGenerator processDiagramGenerator = processEngine.getProcessEngineConfiguration().getProcessDiagramGenerator();
+		InputStream diagram = processDiagramGenerator.generateDiagram(bpmnModel, "png", executedActivityIdList,executedFlowIdList,"WenQuanYi Micro Hei","WenQuanYi Micro Hei", "WenQuanYi Micro Hei",
+                null, 1.0);
+		return diagram;
 	}
 
 }

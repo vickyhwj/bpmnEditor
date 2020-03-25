@@ -103,8 +103,10 @@ public class ModelerController{
         modelNode.put(ModelDataJsonConstants.MODEL_NAME, name);
         modelNode.put(ModelDataJsonConstants.MODEL_DESCRIPTION, "");
         modelNode.put(ModelDataJsonConstants.MODEL_REVISION, 1);
+       
         model.setName(name);
         model.setKey(key);
+        model.setVersion(0);
         model.setMetaInfo(modelNode.toString());
         repositoryService.saveModel(model);
         createObjectNode(model.getId());

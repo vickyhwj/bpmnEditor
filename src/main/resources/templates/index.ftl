@@ -31,6 +31,7 @@
 	             <a href="/publish?modelId=${model.id}">发布</a>
 	             <a href="/revokePublish?modelId=${model.id}">撤销</a>
 	             <a href="/delete?modelId=${model.id}">删除</a>
+	             <a href='/service/model/toUpdate?modelId=${model.id}'>高级修改</a>
 	            </td>
 	        </tr>
 	       </#list>

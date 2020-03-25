@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.activiti6.mapper.TaskRecordMapper">
+    <delete id="deleteByDeploymentId" >
+		delete
+		from
+			task_record
+		where
+			process_instance_id in(
+			select
+				ahp.ID_
+			from
+				act_hi_procinst ahp
+			join act_re_procdef arp on
+				arp.ID_ = ahp.PROC_DEF_ID_
+			where
+				arp.DEPLOYMENT_ID_ = #{DEPLOYMENT_ID_})
+    </delete>
+</mapper>

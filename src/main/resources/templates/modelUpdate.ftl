@@ -7,10 +7,10 @@
 </head>
 <body>
 <form action="save" method="post">
-	modelId<input name="modelId" /><br/>
-	name<input name="name" /><br/>
+	modelId<input name="modelId" value="${modelId}" /><br/>
+	name<input name="name" value="${name}" /><br/>
 	description<input name="description" /><br/>
-	json_xml<input name="json_xml" /><br/>
+	json_xml<textarea name="json_xml" cols="100" rows="60"  >${json_xml}</textarea><br/>
 		svg_xml<input name="svg_xml" /><br/>
 	<input type="submit" />
 </form>

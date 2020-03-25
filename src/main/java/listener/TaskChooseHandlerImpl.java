@@ -1,6 +1,8 @@
 package listener;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.UserTask;
@@ -12,10 +14,16 @@ public class TaskChooseHandlerImpl implements TaskChooseHandler{
 
 	@Override
 	public NextNode getNextNode(SequenceFlow inSequenceFlow,UserTask userTask, NextNode nextNode,String[] param) {
-		nextNode.setAssignType(NextNode.assign_assignee);
+		
+		nextNode.setAssignType(param[0]);
 		nextNode.setTaskId(userTask.getId());
 		nextNode.setTaskName(userTask.getName());
-		nextNode.setUser(Arrays.asList(new User("a1"),new User("a2")));
+		
+		List<User> users=new ArrayList<User>();
+		for(int i=1;i<param.length;++i){
+			users.add(new User(param[i]));
+		}
+		nextNode.setUser(users);
 		return nextNode;
 	}
 

@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -64,7 +65,10 @@ import org.springframework.util.StreamUtils;
 import com.activiti6.Activiti6DemoApplication;
 import com.activiti6.cmd.JumpActivitiCmd;
 import com.activiti6.entity.NextNode;
+import com.activiti6.entity.TaskRecord;
+import com.activiti6.mapper.TaskRecordMapper;
 import com.activiti6.service.ActivitiService;
+import com.activiti6.service.JdbcService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes=Activiti6DemoApplication.class)
@@ -86,6 +90,19 @@ public class HelloWorldControllerTest {
 	@Autowired
 	ActivitiService activitiService;
 	
+	@Autowired
+	JdbcService jdbcService;
+	
+	@Autowired
+	TaskRecordMapper taskRecordMapper;
+	
+	@Test
+	public void mapperTest(){
+		TaskRecord taskRecord=new TaskRecord();
+		taskRecord.setNextFlowName("fuck");
+		taskRecordMapper.insert(taskRecord);
+	}
+	
 	@Test
 	public void t2(){
 		Map<String,Object> ap=new HashMap<>();
@@ -99,13 +116,13 @@ public class HelloWorldControllerTest {
 	   runtimeService.createProcessInstanceBuilder().transientVariables(at).variables(ap).processDefinitionKey("test_back").start();
 	}
 	@Test
-	public void runAndSet() throws ClassNotFoundException, InstantiationException, IllegalAccessException{
+	public void runAndSet() throws Exception{
 		Map<String,Object> ap=new HashMap<>();
 //		ap.put("afP_user","yes");
 	
 		Map<String,Object> at=new HashMap<>();
 		
-		activitiService.runAndClaim("695007", null,null,ap);
+		activitiService.runAndClaim(null, null,null,null,ap);
 	}
 	@Test
 	public void assignee() throws ClassNotFoundException, InstantiationException, IllegalAccessException{
@@ -199,7 +216,7 @@ public class HelloWorldControllerTest {
 	
 	@Test
 	public void writeDia() throws FileNotFoundException, IOException{
-		InputStream is= generateProcessDiagram("537501");
+		InputStream is= generateProcessDiagram("715038");
 		StreamUtils.copy(is, new FileOutputStream(new File("D:/dia.png")));
 		
 	}
@@ -295,8 +312,8 @@ public class HelloWorldControllerTest {
 	
 	@Test
 	public void jump(){
-		String taskId="297505";
-		String targetNodeId="sid-95F02785-5D04-4089-8A48-7305052BE191";
+		String taskId="697502";
+		String targetNodeId="sid-27650487-9CDC-477B-98DF-66141A25313E";
 		
 		processEngine.getManagementService().executeCommand(new JumpActivitiCmd(taskId, targetNodeId));
 	}
@@ -347,6 +364,15 @@ public class HelloWorldControllerTest {
 		}, new Object[]{});
 		
 
+	}
+	
+	@Test
+	public void insertTEST() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException{
+		TaskRecord taskRecord=new TaskRecord();
+//		taskRecord.setId(22L);
+		taskRecord.setNextFlowName("fff");
+		
+		jdbcService.insert(taskRecord);
 	}
 	public static class HiTask{
 		String id_;

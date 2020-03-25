@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import org.activiti.editor.constants.ModelDataJsonConstants;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.activiti6.service.ModelService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -49,6 +51,11 @@ public class ModelSaveRestResource implements ModelDataJsonConstants {
 	@Autowired
 	private ObjectMapper objectMapper;
 	
+	@Autowired
+	ModelService modelService;
+	
+	
+	
 	
 	@RequestMapping(value = "/model/save")
 	@ResponseStatus(value = HttpStatus.OK)
@@ -59,7 +66,31 @@ public class ModelSaveRestResource implements ModelDataJsonConstants {
 
 	
 	@RequestMapping(value = "/model/toUpdate")
-	public ModelAndView toUpdate(ModelAndView modelAndView) {
+	public ModelAndView toUpdate(ModelAndView modelAndView,String modelId) throws UnsupportedEncodingException {
+		Model model= repositoryService.createModelQuery().modelId(modelId).singleResult();
+		
+		modelAndView.addObject("modelId", modelId);
+		modelAndView.addObject("name",model.getName());
+
+		modelAndView.addObject("json_xml", new String(repositoryService.getModelEditorSource(model.getId()), "utf-8"));
+		
+//		byte[] svg_byte= repositoryService.getModelEditorSourceExtra(model.getId());
+//		
+//		InputStream svgStream = new ByteArrayInputStream(svg_xml.getBytes("utf-8"));
+//		TranscoderInput input = new TranscoderInput(svgStream);
+//
+//		PNGTranscoder transcoder = new PNGTranscoder();
+//		// Setup output
+//		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+//		TranscoderOutput output = new TranscoderOutput(outStream);
+//		
+//		// Do the transformation
+//		transcoder.transcode(input, output);
+//		final byte[] result = outStream.toByteArray();
+//		repositoryService.addModelEditorSourceExtra(model.getId(), result);
+//		
+//		modelAndView.addObject("name",model.getName());
+		
         modelAndView.setViewName("modelUpdate");
         return modelAndView;
 	}
@@ -83,34 +114,7 @@ public class ModelSaveRestResource implements ModelDataJsonConstants {
 			String svg_xml) {
 		try {
 
-			Model model = repositoryService.getModel(modelId);
-
-			ObjectNode modelJson = (ObjectNode) objectMapper.readTree(model.getMetaInfo());
-
-//			json_xml = doFilter(json_xml);
-
-			modelJson.put(MODEL_NAME, name);
-			modelJson.put(MODEL_DESCRIPTION, description);
-			model.setMetaInfo(modelJson.toString());
-			model.setName(name);
-			model.setVersion(0);
-			repositoryService.saveModel(model);
-
-			repositoryService.addModelEditorSource(model.getId(), json_xml.getBytes("utf-8"));
-
-			InputStream svgStream = new ByteArrayInputStream(svg_xml.getBytes("utf-8"));
-			TranscoderInput input = new TranscoderInput(svgStream);
-
-			PNGTranscoder transcoder = new PNGTranscoder();
-			// Setup output
-			ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-			TranscoderOutput output = new TranscoderOutput(outStream);
-
-			// Do the transformation
-			transcoder.transcode(input, output);
-			final byte[] result = outStream.toByteArray();
-			repositoryService.addModelEditorSourceExtra(model.getId(), result);
-			outStream.close();
+			modelService.saveModel(modelId, name, description, json_xml, svg_xml);
 		} catch (Exception e) {
 			LOGGER.error("Error saving model", e);
 			throw new ActivitiException("Error saving model", e);

@@ -40,11 +40,16 @@ public class CustomUserTaskJsonConverter extends UserTaskJsonConverter {
         
         String ext=properties.get(ExtAttrKeys.userTask_ext).textValue();
         String taskChooseClass=properties.get(ExtAttrKeys.userTask_chooseClass).textValue();
+        String taskExtListenClass=properties.get(ExtAttrKeys.userTask_extListenClass).textValue();
+        
         if(StringUtils.hasLength(ext)){
         	BpmnUtils.addTaskCustomProperties((UserTask) flowElement,ExtAttrKeys.userTask_ext, ext);
         }
         if(StringUtils.hasLength(taskChooseClass)){
         	BpmnUtils.addTaskCustomProperties((UserTask) flowElement, ExtAttrKeys.userTask_chooseClass, taskChooseClass);
+        }
+        if(StringUtils.hasLength(taskExtListenClass)){
+        	BpmnUtils.addTaskCustomProperties((UserTask) flowElement, ExtAttrKeys.userTask_extListenClass, taskExtListenClass);
         }
         
         return flowElement;

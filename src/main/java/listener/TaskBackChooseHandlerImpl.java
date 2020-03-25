@@ -28,7 +28,7 @@ public abstract class TaskBackChooseHandlerImpl implements TaskChooseHandler{
 		if(isBackSeqFlow(inSequenceFlow)){
 			RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
 			HttpServletRequest request = ((ServletRequestAttributes)requestAttributes).getRequest();
-			String taskId= /*request.getParameter("taskId")*/"697502";
+			String taskId= request.getParameter("taskId");
 			TaskService taskService= SpringUtil.getApplicationContext().getBean(TaskService.class);
 			Task curTask= taskService.createTaskQuery().taskId(taskId).singleResult();
 			String lastAssignee=findLastAssginee(userTask.getId(),curTask.getProcessInstanceId());

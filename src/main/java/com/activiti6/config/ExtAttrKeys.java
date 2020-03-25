@@ -9,5 +9,7 @@ public interface ExtAttrKeys {
 	
 	String userTask_chooseClass="taskchooseclass";
 	
-	String nextNode="nextNode";
+	String userTask_extListenClass="taskextlistenclass";
+	
+	String nextNode="nextFlowId";
 }
